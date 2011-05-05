@@ -296,14 +296,14 @@ undef(%genome); # Free memory
 undef(%recom);
 
 # Reduce SNPs if required
-while ($nsnp > $hersnp) {
-    $var = int(rand @var);
-    next unless ($var[$var] =~ m/:/);
-    ($chr,$pos,$ref,$al1,$al2,$info) = split (/:/, $var[$var]);  
-    next if ($al1 eq $al2);   # Prefer to remove heterozygous positions
-    $var[$var] = ''; # deletion
-    $nsnp--;
-}
+#while ($nsnp > $hersnp) {
+#    $var = int(rand @var);
+#    next unless ($var[$var] =~ m/:/);
+#    ($chr,$pos,$ref,$al1,$al2,$info) = split (/:/, $var[$var]);  
+#    next if ($al1 eq $al2);   # Prefer to remove heterozygous positions
+#    $var[$var] = ''; # deletion
+#    $nsnp--;
+#}
 warn "   $nsnp total parental SNPs\n" if (defined $verbose);
 
 foreach $var (@var) {
