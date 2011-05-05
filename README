@@ -1,5 +1,8 @@
 FAMILY GENOME SIMULATOR
 
+Copyright (C) 2011 Juan Caballero [Insitute for Systems Biology]
+
+QUICK TUTORIAL
 # STEP 1. Create parental genomes
 bin/personalGenome.pl -g data/hg19.fa.gz -d data/dbSNP132.var.gz -p data/CEU.var.gz -o father.var -s M
 bin/personalGenome.pl -g data/hg19.fa.gz -d data/dbSNP132.var.gz -p data/CEU.var.gz -o mother.var
@@ -21,6 +24,8 @@ bin/noise.pl -i   boy2.var -o   boy2.var.data -s M -g data/hg19.fa.gz
 # PROGRAM -h
 # PROGRAM --help
 
+DESCRIPTION
+
 I split this problem in three steps (programs):
 
 1. Creating a personal genome (personalGenome.pl): I use three sources for the variation: 1000genomes population variations data, dbSNP and the reference genome. The total number of variations (SNPs for now) is an expected number (~3 mill) with a little noise, or you can fix the number. De novo SNPs can be added (default 1%). You can choose the sex, but for now I not modeling recombination in sexual chromosomes. In the first round it selects population-specific SNPs (~ 1mill because data comes from SNP-chips), the second round take data from dbSNP and in the last round de novo SNPs are created. I integrate diverse options and configurations (no population SNPs, no de novo, homozygous SNPs, etc) to as flexible as possible. The output is a text table with columns:
@@ -29,8 +34,7 @@ CHROM POSITION REF_ALLELE ALLELE_1 ALLELE_2 ALLELE_INFO
 2. Artificial Sex (reproduction.pl): this script takes a personal genome from a "father" and a "mother", performs meiosis in each genome based in a distribution of recombination points and mix together to produce a "child". You can define the sex, total SNPs, de novo SNPs and other parameters. The output is the same:
 CHROM POSITION REF_ALLELE ALLELE_1 ALLELE_2 ALLELE_INFO
 
-3. Noise/Error addition (noise.pl): in current development, but I expect to model missing SNPs, bad base calling, half-calling and false positives SNPs as error/noise.
+3. Noise/Error addition (noise.pl): this part models missing SNPs, bad base calling, half-calling and false positives SNPs as error/noise.
 
 There are some optimization I can do, each programs uses a lot of memory (~4-5 GB), because I need to load the reference genome, but are relatively fast, 5 min to produce a genome and 5 min to produce a child.
 
-The programs and data are located in my home directory in the servers under: /users/jcaballe/FakeFamily
