@@ -65,6 +65,7 @@ while (<T>) {
     ($chr, $pos, $ref, $f1, $f2, $m1, $m2, $c1, $c2) = split (/\t/, $_);
     $pos++; # 1-based coordinates
     if (defined $popvar{$chr}{$pos}{'rs'}) {
+        $rs   = $popvar{$chr}{$pos}{'rs'};
         $fa_f = "$f1/$f2";
         $ma_f = "$m1/$m2";
         $ca_f = "$c1/$c2";
@@ -82,7 +83,7 @@ while (<T>) {
         $ca_p = $popvar{$chr}{$pos}{$ca_f} if (defined $popvar{$chr}{$pos}{$ca_f});
         $ca_p = $popvar{$chr}{$pos}{$ca_r} if (defined $popvar{$chr}{$pos}{$ca_r});
         
-        $_ .= "$fa_p\t$ma_p\t$ca_p";
+        $_ .= "\t$rs\t$fa_p:$ma_p:$ca_p";
     }
     print "$_\n";
 }
