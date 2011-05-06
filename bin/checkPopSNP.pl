@@ -39,7 +39,7 @@ my $dbsnp   = shift @ARGV;
 my $triovar = shift @ARGV;
 my %popvar  = ();
 my %dbsnp   = ();
-my ($chr, $pos, $rs, $ref, $var, $freq);
+my ($chr, $pos, $rs, $ref, $var, $freq, $p);
 my ($f1, $f2, $m1, $m2, $c1, $c2);
 my ($fa_p, $ma_p, $ca_p);
 my ($fa_f, $ma_f, $ca_f);
@@ -100,7 +100,7 @@ while (<T>) {
     }
     elsif (defined $dbsnp{$chr}{$pos}{'rs'}) {
         $rs = $dbsnp{$chr}{$pos}{'rs'};
-        $p  = $dbsnp{$chr}{$pos}{'p'}
+        $p  = $dbsnp{$chr}{$pos}{'p'};
         $_ .= "\tDB:$rs\t$p";
     }
     print "$_\n";
