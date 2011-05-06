@@ -32,11 +32,13 @@ along with code.  If not, see <http://www.gnu.org/licenses/>.
 use strict;
 use warnings;
 
-$ARGV[1] or die "usage: PopSNP.var.gz TRIO.var\n";
+$ARGV[2] or die "usage: PopSNP.var.gz dbSNP.var.gz TRIO.var\n";
 
 my $popvar  = shift @ARGV;
+my $dbsnp   = shift @ARGV;
 my $triovar = shift @ARGV;
 my %popvar  = ();
+my %dbsnp   = ();
 my ($chr, $pos, $rs, $ref, $var, $freq);
 my ($f1, $f2, $m1, $m2, $c1, $c2);
 my ($fa_p, $ma_p, $ca_p);
@@ -57,6 +59,17 @@ while (<P>) {
     }
 }
 close P;
+
+warn "loading dbSNPs\n";
+open D, "gunzip -c $dbsnp | " or die "cannot open $dbsnp\n";
+while (<D>) {
+    chomp;
+    ($chr, $pos, $rs, $ref, $var, $freq) = split (/\t/, $_);
+    $chr = "chr$chr";
+    $dbsnp{$chr}{$pos}{'rs'} = $rs;
+    $dbsnp{$chr}{$pos}{'p'}  = $p;
+}
+close D;
 
 warn "parsing trio variations\n";
 open T, "$triovar" or die "cannot open $triovar\n";
@@ -83,7 +96,12 @@ while (<T>) {
         $ca_p = $popvar{$chr}{$pos}{$ca_f} if (defined $popvar{$chr}{$pos}{$ca_f});
         $ca_p = $popvar{$chr}{$pos}{$ca_r} if (defined $popvar{$chr}{$pos}{$ca_r});
         
-        $_ .= "\t$rs\t$fa_p:$ma_p:$ca_p";
+        $_ .= "\tPV:$rs\t$fa_p:$ma_p:$ca_p";
+    }
+    elsif (defined $dbsnp{$chr}{$pos}{'rs'}) {
+        $rs = $dbsnp{$chr}{$pos}{'rs'};
+        $p  = $dbsnp{$chr}{$pos}{'p'}
+        $_ .= "\tDB:$rs\t$p";
     }
     print "$_\n";
 }
