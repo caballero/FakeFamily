@@ -101,8 +101,9 @@ while (<>) {
             $lab = $rs1 if ($rs1 eq $rs2);
         }
     }
-    
-    my $tag = "ID=SNV$num;Variant_seq=$a1,$a2;Reference_seq=$r1;Genotype=$gtype;";
+    my $id = "ID=SVN$num";
+    $id = $lab if ($lab =~ m/rs\d+/);
+    my $tag = "ID=$id;Variant_seq=$a1,$a2;Reference_seq=$r1;Genotype=$gtype;";
     print join "\t", $chr, $lab, 'SNV', $pos, $pos, $qual, '+', '.', $tag;
     print "\n";
 }
