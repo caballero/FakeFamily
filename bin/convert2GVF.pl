@@ -90,7 +90,7 @@ while (<>) {
     $num++;
     my ($chr, $pos, $r1, $a1, $a2, $info) = split (/\t/, $_);
     my $gtype = 'heterozygous';
-    my $gtype = 'homozygous' if ($a1 eq $a2);
+    $gtype = 'homozygous' if ($a1 eq $a2);
     my $lab   = $label;
     if ($info =~ /rs\d+/) {
         $lab = $info;
@@ -107,7 +107,65 @@ sub getHeader {
     my $ref = shift @_;
     my $head = "##gff-version 3\n##gvf-version 1.02\n";
     
-    if ($read eq 'hg19') {
+    if ($ref eq 'hg19') {
+        $head .= <<_last
+##sequence-region chr1  1 249250621
+##sequence-region chr2  1 243199373
+##sequence-region chr3  1 198022430
+##sequence-region chr4  1 191154276
+##sequence-region chr5  1 180915260
+##sequence-region chr6  1 171115067
+##sequence-region chr7  1 159138663
+##sequence-region chr8  1 146364022
+##sequence-region chr9  1 141213431
+##sequence-region chr10 1 135534747
+##sequence-region chr11 1 135006516
+##sequence-region chr12 1 133851895
+##sequence-region chr13 1 115169878
+##sequence-region chr14 1 107349540
+##sequence-region chr15 1 102531392
+##sequence-region chr16 1 90354753
+##sequence-region chr17 1 81195210
+##sequence-region chr18 1 78077248
+##sequence-region chr19 1 59128983
+##sequence-region chr20 1 63025520
+##sequence-region chr21 1 48129895
+##sequence-region chr22 1 51304566
+##sequence-region chrX  1 155270560
+##sequence-region chrY  1 59373566
+##sequence-region chrM  1 16571
+_last
+;   }
+    elsif ($ref eq 'GRCh37') {
+        $head .= <<_last
+##sequence-region chr1  1 249250621
+##sequence-region chr2  1 243199373
+##sequence-region chr3  1 198022430
+##sequence-region chr4  1 191154276
+##sequence-region chr5  1 180915260
+##sequence-region chr6  1 171115067
+##sequence-region chr7  1 159138663
+##sequence-region chr8  1 146364022
+##sequence-region chr9  1 141213431
+##sequence-region chr10 1 135534747
+##sequence-region chr11 1 135006516
+##sequence-region chr12 1 133851895
+##sequence-region chr13 1 115169878
+##sequence-region chr14 1 107349540
+##sequence-region chr15 1 102531392
+##sequence-region chr16 1 90354753
+##sequence-region chr17 1 81195210
+##sequence-region chr18 1 78077248
+##sequence-region chr19 1 59128983
+##sequence-region chr20 1 63025520
+##sequence-region chr21 1 48129895
+##sequence-region chr22 1 51304566
+##sequence-region chrX  1 155270560
+##sequence-region chrY  1 59373566
+##sequence-region chrM  1 16571
+_last
+;   }
+    elsif ($ref eq 'hg18') {
         $head .= <<_last
 ##sequence-region chr1  1 247249719
 ##sequence-region chr2  1 242951149
@@ -136,65 +194,7 @@ sub getHeader {
 ##sequence-region chrM  1 16571
 _last
 ;   }
-    elsif ($read eq 'GRCh37') {
-        $head .= <<_last
-##sequence-region chr1  1 247249719
-##sequence-region chr2  1 242951149
-##sequence-region chr3  1 199501827
-##sequence-region chr4  1 191273063
-##sequence-region chr5  1 180857866
-##sequence-region chr6  1 170899992
-##sequence-region chr7  1 158821424
-##sequence-region chr8  1 146274826
-##sequence-region chr9  1 140273252
-##sequence-region chr10 1 135374737
-##sequence-region chr11 1 134452384
-##sequence-region chr12 1 132349534
-##sequence-region chr13 1 114142980
-##sequence-region chr14 1 106368585
-##sequence-region chr15 1 100338915
-##sequence-region chr16 1 88827254
-##sequence-region chr17 1 78774742
-##sequence-region chr18 1 76117153
-##sequence-region chr19 1 63811651
-##sequence-region chr20 1 62435964
-##sequence-region chr21 1 46944323
-##sequence-region chr22 1 49691432
-##sequence-region chrX  1 154913754
-##sequence-region chrY  1 57772954
-##sequence-region chrM  1 16571
-_last
-;   }
-    elsif ($read eq 'hg18') {
-        $head .= <<_last
-##sequence-region chr1  1 247249719
-##sequence-region chr2  1 242951149
-##sequence-region chr3  1 199501827
-##sequence-region chr4  1 191273063
-##sequence-region chr5  1 180857866
-##sequence-region chr6  1 170899992
-##sequence-region chr7  1 158821424
-##sequence-region chr8  1 146274826
-##sequence-region chr9  1 140273252
-##sequence-region chr10 1 135374737
-##sequence-region chr11 1 134452384
-##sequence-region chr12 1 132349534
-##sequence-region chr13 1 114142980
-##sequence-region chr14 1 106368585
-##sequence-region chr15 1 100338915
-##sequence-region chr16 1 88827254
-##sequence-region chr17 1 78774742
-##sequence-region chr18 1 76117153
-##sequence-region chr19 1 63811651
-##sequence-region chr20 1 62435964
-##sequence-region chr21 1 46944323
-##sequence-region chr22 1 49691432
-##sequence-region chrX  1 154913754
-##sequence-region chrY  1 57772954
-##sequence-region chrM  1 16571
-_last
-;   }
-    elsif ($read eq 'NCBI B36') {
+    elsif ($ref eq 'NCBI B36') {
         $head .= <<_last
 ##sequence-region chr1  1 247249719
 ##sequence-region chr2  1 242951149
