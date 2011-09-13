@@ -96,6 +96,10 @@ while (<>) {
         $lab = $info;
         $lab =~ s/,$//;
         $lab =~ s/^,//;
+        if ($lab =~ m/,/) {
+            my ($rs1, $rs2) = split (/,/, $_);
+            $lab = $rs1 if ($rs1 eq $rs2);
+        }
     }
     
     my $tag = "ID=SNV$num;Variant_seq=$a1,$a2;Reference_seq=$r1;Genotype=$gtype;";
