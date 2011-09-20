@@ -426,12 +426,14 @@ sub getRecomPoints {
     my %points = ();
     foreach my $chr (keys %{ $size{$mod} }) {
         my $len = $size{$mod}{$chr};
+        my @pos = ();
         my $pos = 0;
         while ($pos <= $len) {
             $pos += getSize();
-            push @{ $points{$chr} }, $pos;
+            push @pos, $pos;
         }
-        push @{ $points{$chr} }, $len;
+        @pos = filterPoints($chr, @pos);
+        push @{ $points{$chr} }, @pos, $len;
     }
     return %points;
 }
@@ -456,6 +458,28 @@ sub getSize {
     $size = $min if ($size < $min);
     $size = $max if ($size > $max);
     return $size;
+}
+
+sub filterPoints {
+    my $chr    = shift @_;
+    my $centro = $centro{$mod}{$chr};
+    my $size   = $size{$mod}{$chr};
+    my $left   = $centro;
+    my $right  = $size - $centro;
+    my @pos = ();
+    foreach my $pos (@_) {
+        my $dice = rand();
+        my $prob = 0;
+        if ($pos < $centro) {
+            $prob = 1 - ($pos / $left);
+        }
+        elsif ($pos > $centro) {
+            $prob = $pos / $right;
+        }
+        
+        push @pos, $pos if ($dice < $prob);
+    }
+    return @pos;
 }
 
 sub calcNumSnp {
