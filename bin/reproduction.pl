@@ -38,7 +38,7 @@ OPTIONS:
       CHROM POSITION REF_ALLELE ALLELE_1 ALLELE_2 ALLELE_INFO
   [3] Male or Female.
   [4] Sequence sizes can use kb, Mb symbols. Default is b.
-  [5] Currently supporting hg19 information (chromosome sizes).
+  [5] Currently supporting hg19/hg18 information (chromosome sizes).
 
 =head1 EXAMPLES
 
