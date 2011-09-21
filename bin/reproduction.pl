@@ -432,8 +432,9 @@ sub getRecomPoints {
             $pos += getSize();
             push @pos, $pos;
         }
-        @pos = filterPoints($chr, @pos);
-        push @{ $points{$chr} }, @pos, $len;
+        my @pos_fil = filterPoints($chr, @pos);
+        @{ $points{$chr} } = @pos_fil;
+        push @{ $points{$chr} }, $len;
     }
     return %points;
 }
