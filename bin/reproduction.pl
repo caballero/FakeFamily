@@ -445,7 +445,7 @@ sub convertSymbol {
 sub getRecomPoints {
     my %points = ();
     foreach my $chr (keys %{ $size{$mod} }) {
-        next if ($chr eq 'chrM');
+        next if ($chr =~ m/chrM|chrY|chrX/);
         my $len = $size{$mod}{$chr};
         my @pos = ();
         my $pos = 0;
@@ -513,7 +513,6 @@ sub filterPointsHapMap {
 	warn "    original recombination points $#_\n" if (defined $verbose);
 	my $last = 1;
     foreach my $pos (@_) {
-		warn "    $chr, $last, $pos\n" if (defined $verbose);
         my $gendis = $hm->genetic_distance($chr, $last, $pos);
 		if ($gendis > 7) { 
 			push @pos, $pos;
