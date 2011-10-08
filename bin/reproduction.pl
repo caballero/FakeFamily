@@ -85,6 +85,10 @@ use strict;
 use warnings;
 use Getopt::Long;
 use Pod::Usage;
+# sorry I need to hardcode the HapMap lib, in a future we'll share the lib and data
+use lib "/proj/famgen/lib/gglusman" if (-e '/proj/famgen/lib/gglusman/HapMap.pm'); #bobama
+use lib "/net/gestalt/system/utils" if (-e '/proj/famgen/lib/gglusman/HapMap.pm'); #osiris
+use HapMap;
 
 # Global variables
 my %size       = ();
@@ -445,7 +449,7 @@ sub getRecomPoints {
             $pos += getSize();
             push @pos, $pos;
         }
-        my @pos_fil = filterPoints($chr, @pos);
+        my @pos_fil = filterPointsHapMap($chr, @pos);
         @{ $points{$chr} } = @pos_fil;
         push @{ $points{$chr} }, $len;
     }
@@ -492,6 +496,21 @@ sub filterPoints {
         }
         
         push @pos, $pos if ($dice < $prob);
+    }
+    return @pos;
+}
+
+sub filterPointsHapMap {
+    my $chr  = shift @_;
+	my $hm   = new HapMap($mod);
+    my @pos  = ();
+	my $last = shift @_;
+    foreach my $pos (@_) {
+        my $dice = rand();
+        my $d    = $hm->genetic_distance($chr, $last, $pos);
+		my $p    = (1 - exp(-2 * $d / 100)) / 2; 
+        push @pos, $pos if ($dice < $p);
+		$last    = $pos;
     }
     return @pos;
 }
