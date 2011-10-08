@@ -222,7 +222,7 @@ open M, "$mother_h" or die "cannot open $mother\n";
 while (<M>) {
     chomp;
     ($chr, $pos, $ref, $al1, $al2, $info) = split (/\t/, $_);
-    unless ($chr eq 'chrM') {
+    unless ($chr =~ m/chrM|chrY|chrX/) {
         if ($pos > $recom{$chr}->[0]) {
             shift @{ $recom{$chr} };
             # Swap alleles
@@ -510,7 +510,7 @@ sub filterPointsHapMap {
     my $chr  = shift @_;
 	my $hm   = new HapMap($mod);
     my @pos  = ();
-	warn "    original recombination points $#_\n" if (defined $verbose);
+	warn "    $chr original recombination points $#_\n" if (defined $verbose);
 	my $last = 1;
     foreach my $pos (@_) {
         my $gendis = $hm->genetic_distance($chr, $last, $pos);
@@ -519,7 +519,7 @@ sub filterPointsHapMap {
 			$last    = $pos;
 		}
     }
-	warn "    filtered recombination points $#pos\n" if (defined $verbose);
+	warn "    $chr filtered recombination points $#pos\n" if (defined $verbose);
     return @pos;
 }
 
