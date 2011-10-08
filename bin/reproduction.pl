@@ -513,7 +513,7 @@ sub filterPointsHapMap {
 	warn "    original recombination points $#_\n" if (defined $verbose);
 	my $last = 1;
     foreach my $pos (@_) {
-        my $gendist  = $hm->genetic_distance($chr, $last, $pos);
+        my $gendis  = $hm->genetic_distance($chr, $last, $pos);
 		if ($gendis > 7) { 
 			push @pos, $pos;
 			$last    = $pos;
