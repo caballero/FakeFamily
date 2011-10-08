@@ -510,18 +510,15 @@ sub filterPointsHapMap {
     my $chr  = shift @_;
 	my $hm   = new HapMap($mod);
     my @pos  = ();
-	
 	warn "    original recombination points $#_\n" if (defined $verbose);
-	my $last = shift @_;
+	my $last = 1;
     foreach my $pos (@_) {
-        my $dice = rand();
-        my $d    = $hm->genetic_distance($chr, $last, $pos);
-		my $p    = (1 - exp(-2 * $d / 100)) / 2; 
-		warn "   $chr $last $pos $d $p $dice\n" if (defined $verbose);
-        push @pos, $pos if ($dice < $p);
-		$last    = $pos;
+        my $gendist  = $hm->genetic_distance($chr, $last, $pos);
+		if ($gendis > 7) { 
+			push @pos, $pos;
+			$last    = $pos;
+		}
     }
-	
 	warn "    filtered recombination points $#pos\n" if (defined $verbose);
     return @pos;
 }
