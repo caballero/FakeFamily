@@ -86,8 +86,12 @@ use warnings;
 use Getopt::Long;
 use Pod::Usage;
 # sorry I need to hardcode the HapMap lib, in a future we'll share the lib and data
-use lib "/proj/famgen/lib/gglusman" if (-e '/proj/famgen/lib/gglusman/HapMap.pm'); #bobama
-use lib "/net/gestalt/system/utils" if (-e '/proj/famgen/lib/gglusman/HapMap.pm'); #osiris
+if (-e '/proj/famgen/lib/gglusman/HapMap.pm') { #bobama
+    use lib "/proj/famgen/lib/gglusman";
+}
+if (-e '/proj/famgen/lib/gglusman/HapMap.pm') { #osiris
+    use lib "/net/gestalt/system/utils";
+}
 use HapMap;
 
 # Global variables
