@@ -489,6 +489,7 @@ sub filterPoints {
     my $left   = $centro;
     my $right  = $size - $centro;
     my @pos = ();
+	warn "    original recombination points $#_\n" if (defined $verbose);
     foreach my $pos (@_) {
         my $dice = rand();
         my $prob = 0;
@@ -501,6 +502,7 @@ sub filterPoints {
         
         push @pos, $pos if ($dice < $prob);
     }
+	warn "    filtered recombination points $#pos\n" if (defined $verbose);
     return @pos;
 }
 
@@ -508,6 +510,8 @@ sub filterPointsHapMap {
     my $chr  = shift @_;
 	my $hm   = new HapMap($mod);
     my @pos  = ();
+	
+	warn "    original recombination points $#_\n" if (defined $verbose);
 	my $last = shift @_;
     foreach my $pos (@_) {
         my $dice = rand();
@@ -516,6 +520,8 @@ sub filterPointsHapMap {
         push @pos, $pos if ($dice < $p);
 		$last    = $pos;
     }
+	
+	warn "    filtered recombination points $#pos\n" if (defined $verbose);
     return @pos;
 }
 
