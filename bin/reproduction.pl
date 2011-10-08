@@ -517,6 +517,7 @@ sub filterPointsHapMap {
         my $dice = rand();
         my $d    = $hm->genetic_distance($chr, $last, $pos);
 		my $p    = (1 - exp(-2 * $d / 100)) / 2; 
+		warn "   $chr $last $pos $d $p $dice\n" if (defined $verbose);
         push @pos, $pos if ($dice < $p);
 		$last    = $pos;
     }
