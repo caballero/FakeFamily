@@ -88,6 +88,14 @@ use warnings;
 use Getopt::Long;
 use Pod::Usage;
 use List::Util qw/shuffle/;
+# sorry I need to hardcode the HapMap lib, in a future we'll share the lib and data
+if (-e '/proj/famgen/lib/gglusman/HapMap.pm') { #bobama
+    use lib "/proj/famgen/lib/gglusman";
+}
+if (-e '/proj/famgen/lib/gglusman/HapMap.pm') { #osiris
+    use lib "/net/gestalt/system/utils";
+}
+use HapMap;
 
 # Global variables
 my %size       = ();
@@ -187,6 +195,8 @@ while (<F>) {
     # Sex specific alleles
     next if ($chr eq 'chrX' and $sex eq 'M');
     next if ($chr eq 'chrY' and $sex eq 'F');
+    next if ($chr eq 'chrM');
+    
     # No recombination in Sex Chromosomes, for now ...
     if ($chr eq 'chrY' or $chr eq 'chrX') {
         $allele = 1;
@@ -217,12 +227,13 @@ open M, "$mother_h" or die "cannot open $mother\n";
 while (<M>) {
     chomp;
     ($chr, $pos, $ref, $al1, $al2, $info) = split (/\t/, $_);
-    if ($pos > $recom{$chr}->[0]) {
-        shift @{ $recom{$chr} };
-        # Swap alleles
-        if ($allele == 1) { $allele = 2; } else { $allele = 1; }
-    }
-    
+    unless ($chr =~ m/chrM|chrY|chrX/) {
+        if ($pos > $recom{$chr}->[0]) {
+            shift @{ $recom{$chr} };
+            # Swap alleles
+            if ($allele == 1) { $allele = 2; } else { $allele = 1; }
+        }
+    }    
     $alt = $al1;
     $alt = $al2 if ($allele == 2);    
     $genome{$chr}{$pos}{'mother'} = $alt;
@@ -247,6 +258,15 @@ foreach $chr (keys %genome) {
             }
         }
         elsif ($chr eq 'chrX' and $sex eq 'M') {
+            if (defined $genome{$chr}{$pos}{'mother'}) {
+                $al2 = $genome{$chr}{$pos}{'mother'};
+                $al1 = '-';
+            }
+            else {
+                next;
+            }
+        }
+        elsif ($chr eq 'chrM') {
             if (defined $genome{$chr}{$pos}{'mother'}) {
                 $al2 = $genome{$chr}{$pos}{'mother'};
                 $al1 = '-';
@@ -431,6 +451,7 @@ sub getRecomPoints {
     my %points = ();
     my $num    = 0;
     foreach my $chr (keys %{ $size{$mod} }) {
+        next if ($chr =~ m/chrM|chrY|chrX/);
         my $len = $size{$mod}{$chr};
         my @pos = ();
         my $pos = 0;
@@ -438,10 +459,9 @@ sub getRecomPoints {
             $pos += getSize();
             push @pos, $pos;
         }
-        @pos = filterPoints($chr, @pos);
-        @{ $points{$chr} } = @pos;
         $num += length @{ $points{$chr} };
-        push @{ $points{$chr} }, $len;
+        my @pos_fil = filterPointsHapMap($chr, @pos);
+        @{ $points{$chr} } = @pos_fil;
     }
     
     if (defined $points) {
@@ -499,6 +519,7 @@ sub filterPoints {
     my $left   = $centro;
     my $right  = $size - $centro;
     my @pos = ();
+	warn "    original recombination points $#_\n" if (defined $verbose);
     foreach my $pos (@_) {
         my $dice = rand();
         my $prob = 0;
@@ -511,6 +532,25 @@ sub filterPoints {
         
         push @pos, $pos if ($dice < $prob);
     }
+	warn "    filtered recombination points $#pos\n" if (defined $verbose);
+    return @pos;
+}
+
+sub filterPointsHapMap {
+    my $chr  = shift @_;
+	my $hm   = new HapMap($mod);
+    my @pos  = ();
+    my $lim  = 7; # minimal genetic distance to consider a recombination
+	warn "    $chr original recombination points $#_\n" if (defined $verbose);
+	my $last = 1;
+    foreach my $pos (@_) {
+        my $gendis = $hm->genetic_distance($chr, $last, $pos);
+		if ($gendis > $lim) { 
+			push @pos, $pos;
+			$last    = $pos;
+		}
+    }
+	warn "    $chr filtered recombination points $#pos\n" if (defined $verbose);
     return @pos;
 }
 
@@ -569,6 +609,7 @@ hg18:chr21:46944323:12300000
 hg18:chr22:49691432:11800000
 hg18:chrX:154913754:59500000
 hg18:chrY:57772954:11300000
+hg18:chrM:16571:16571
 hg19:chr1:249250621:125000000
 hg19:chr2:243199373:93300000
 hg19:chr3:198022430:91000000
@@ -593,3 +634,4 @@ hg19:chr21:48129895:13200000
 hg19:chr22:51304566:14700000
 hg19:chrX:155270560:60600000
 hg19:chrY:59373566:12500000
+hg19:chrM:16571:16571

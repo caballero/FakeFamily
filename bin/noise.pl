@@ -6,20 +6,25 @@ noise.pl
 
 =head1 DESCRIPTION
 
-Add noise (error sequencing) in a variation file.
+Add noise (errors in sequencing) in a variation file.
 
 =head1 USAGE
 
 perl noise.pl [OPTIONS]
 
 OPTIONS
-    Parameter     Description              Value       Default
-    -i --input    Input  VAR file*         FILE        
-    -o --output   Output VAR file          FILE
-    -g --genome   Genome sequence*         FILE
-    -e --error    Error rate               0.0-1.0     0.01 (1%)
-    -s --sex      Sex to use               M/F***
+   Parameter                Description              Value       Default
+    -i --input              Input  VAR file*         FILE        
+    -o --output             Output VAR file          FILE
+    -g --genome             Genome fasta file*       FILE
+    -s --sex                Sex to use               M/F***
 
+   Error rates:
+    --ur --undercall_ref    Undercall reference      Float       1e-3
+    --un --undercall_noref  Undercall no reference   Float       2e-4
+    --or --overcall_ref     Overcall reference       Float       2e-6
+    --on --overcall_noref   Overcall no reference    Float       2e-4
+    
     --nonew       No new mutations**
     
     -h --help     Print this screen
@@ -34,8 +39,8 @@ OPTIONS
     # Typical use
     perl noise.pl -g hg19.fa.gz -i genome.var -o mod_genome.var
     
-    # Increase error rate to 10%
-    perl noise.pl -i genome.var -o mod_genome.var -e 0.1 -g hg19.fa.gz 
+    # Increase undercall no reference error rate to 1e-2
+    perl noise.pl -i genome.var -o mod_genome.var --un 0.01 -g hg19.fa.gz 
 
 =head1 AUTHOR
 
@@ -72,21 +77,27 @@ my $help       = undef;
 my $verbose    = undef;
 my $input      = undef;
 my $output     = undef;
-my $error      =  0.01;
 my $genome     = undef;
 my $nonew      = undef;
 my $sex        = undef;
+my $uc_ref     = 1e-3;
+my $uc_noref   = 2e-4;
+my $oc_ref     = 2e-6;
+my $oc_noref   = 2e-4;
 
 # Fetch options
 GetOptions(
-    'h|help'          => \$help,
-    'v|verbose'       => \$verbose,
-    'i|input:s'       => \$input,
-    'o|output:s'      => \$output,
-    'e|error:s'       => \$error,
-    'g|genome:s'      => \$genome,
-    'n|nonew'         => \$nonew,
-    's|sex:s'         => \$sex
+    'h|help'             => \$help,
+    'v|verbose'          => \$verbose,
+    'i|input:s'          => \$input,
+    'o|output:s'         => \$output,
+    'g|genome:s'         => \$genome,
+    'n|nonew'            => \$nonew,
+    's|sex:s'            => \$sex,
+    'uc|undercall_ref'   => \$uc_ref,
+    'un|undercall_noref' => \$uc_noref,
+    'oc|overcall_ref'    => \$oc_ref,
+    'on|overcall_noref'  => \$oc_noref,
 );
 pod2usage(-verbose => 2) if (defined $help);
 pod2usage(-verbose => 2) unless (defined $input and defined $output and defined $sex);
@@ -103,8 +114,7 @@ my @chrom      = ();
 my @dna        = qw/A C G T/;
 my @dna2       = ();
 my $numerr     = 0;
-my @error      = qw/del sus/;
-push (@error, 'new') unless (defined $nonew);
+my @error      = ();
 my %genome     = ();
 my %size       = ();
 my %var        = ();
@@ -120,28 +130,10 @@ open IN, "$file_h" or die "cannot open $input\n";
 close IN;
 
 # loading genome asequences
-unless (defined $nonew) {
-    warn "loading genome sequences\n" if (defined $verbose);
-    $file_h = $genome;
-    $file_h = "gunzip  -c $genome | " if ($genome =~ m/gz$/);
-    $file_h = "bunzip2 -c $genome | " if ($genome =~ m/bz2$/);
-    open F, "$file_h" or die "cannot open $genome\n";
-    while (<F>) {
-        chomp;
-        if (m/>(.+)/) {
-            $chr = $1;
-            push @chrom, $chr;
-        }
-        else {
-            $genome{$chr} .= $_;
-            $size{$chr} += length $_;
-        }
-    }
-    close F;
-}
+loadGenome() unless (defined $nonew);
 
 # Computing number or errors
-$numerr = int($error * ($#var + 1));
+$numerr = calcErrors($#var);
 warn "perfoming $numerr changes\n" if (defined $verbose);
 
 # Doing changes
@@ -246,4 +238,34 @@ sub dnaSel {
         push @res, $n unless ($n eq $rem);
     }
     return @res;
+}
+
+sub calcErrors {
+    my $tot = shift @_;
+    my $ur  = int($uc_ref   * $tot);
+    my $un  = int($uc_noref * $tot);
+    my $or  = int($oc_ref   * $tot);
+    my $on  = int($oc_noref * $tot);
+    my $sum = $ur + $or + $un + $on;
+    return $sum;
+}
+
+sub loadGenome {
+    warn "loading genome sequences\n" if (defined $verbose);
+    $file_h = $genome;
+    $file_h = "gunzip  -c $genome | " if ($genome =~ m/gz$/);
+    $file_h = "bunzip2 -c $genome | " if ($genome =~ m/bz2$/);
+    open F, "$file_h" or die "cannot open $genome\n";
+    while (<F>) {
+        chomp;
+        if (m/>(.+)/) {
+            $chr = $1;
+            push @chrom, $chr;
+        }
+        else {
+            $genome{$chr} .= $_;
+            $size{$chr} += length $_;
+        }
+    }
+    close F;
 }
