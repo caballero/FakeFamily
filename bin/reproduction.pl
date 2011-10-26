@@ -461,7 +461,7 @@ sub getRecomPoints {
         }
         my @pos_fil = filterPointsHapMap($chr, @pos);
         @{ $points{$chr} } = @pos_fil;
-        $num += length @pos_fil;
+        $num += $#pos_fil + 1;
     }
     
     warn "recom $num, wanted $points\n" if (defined $verbose);
