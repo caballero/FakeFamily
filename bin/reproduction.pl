@@ -476,13 +476,14 @@ sub getRecomPoints {
             @pos = shuffle(@pos);
             %points = ();
             for (my $i = 1; $i <= $points; $i++) {
-                my ($chr, $pos) = split ($pos[$i]);
+                my ($chr, $pos) = split (/:/, $pos[$i]);
                 push @{ $points{$chr} }, $pos;
             }
         }
     }
     # add tails to the data
     foreach my $chr (keys %{ $size{$mod} }) {
+        next if ($chr =~ m/chrM|chrY|chrX/);
         my $len = $size{$mod}{$chr};
         push @{ $points{$chr} }, $len;
         my $pts = length @{ $points{$chr} };
