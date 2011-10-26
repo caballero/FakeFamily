@@ -464,7 +464,6 @@ sub getRecomPoints {
         $num += $#pos_fil + 1;
     }
     
-    warn "recom $num, wanted $points\n" if (defined $verbose);
     if (defined $points) {
         if ($num > $points) {
             # reduce the recombination points, random deletions
