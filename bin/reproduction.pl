@@ -26,6 +26,7 @@ OPTIONS:
     -n --numsnp    Total number of SNPs          INT         AUTO
     -d --denovo    De novo mutations fraction    0.0-1.0     0.01 (1%)
     -t --hratio    Homo/hetero probility         0.0-1.0     0.5
+    -p --points    Total recombination points    INT         
     
     -h  --help     Print this screen
     -v  --verbose  Verbose mode
@@ -54,7 +55,8 @@ OPTIONS:
   Simulate a girl, no new SNPs:
   perl reproduction.pl -f father.var -m mother.var -c girl.var -d 0
   
-  
+  Simulate a girl, no new SNPs, max 20 recombination points:
+  perl reproduction.pl -f father.var -m mother.var -c girl.var -d 0 -p 20
 
 =head1 AUTHOR
 
@@ -85,6 +87,7 @@ use strict;
 use warnings;
 use Getopt::Long;
 use Pod::Usage;
+use List::Util qw/shuffle/;
 
 # Global variables
 my %size       = ();
@@ -119,6 +122,7 @@ my $numsnp     = undef;
 my $denovo     = 0.01;
 my $genome     = undef;
 my $hratio     = 0.5;
+my $points     = undef;
 
 # Fetch options
 GetOptions(
@@ -135,7 +139,8 @@ GetOptions(
     'r|reference:s'   => \$genome,
     'n|numsnp:i'      => \$numsnp,
     'd|denovo:s'      => \$denovo,
-    't|hratio:s'      => \$hratio
+    't|hratio:s'      => \$hratio,
+    'p|points:s'      => \$points
 );
 pod2usage(-verbose => 2)     if (defined $help);
 pod2usage(-verbose => 2) unless (defined $mother and defined $father);
@@ -424,6 +429,7 @@ sub convertSymbol {
 
 sub getRecomPoints {
     my %points = ();
+    my $num    = 0;
     foreach my $chr (keys %{ $size{$mod} }) {
         my $len = $size{$mod}{$chr};
         my @pos = ();
@@ -432,10 +438,35 @@ sub getRecomPoints {
             $pos += getSize();
             push @pos, $pos;
         }
-        my @pos_fil = filterPoints($chr, @pos);
-        @{ $points{$chr} } = @pos_fil;
+        @pos = filterPoints($chr, @pos);
+        @{ $points{$chr} } = @pos;
+        $num += length @{ $points{$chr} };
         push @{ $points{$chr} }, $len;
     }
+    
+    if (defined $points) {
+        if ($num > $points) {
+            # reduce the recombination points, random deletions
+            my @pos = ();
+            foreach my $chr (keys %points) {
+                foreach my $pos (@{ $points{$chr} }) {
+                    push @pos, "$chr:$pos";
+                }
+            }
+            @pos = shuffle(@pos);
+            %points = ();
+            for (my $i = 1; $i <= $points; $i++) {
+                my ($chr, $pos) = split ($pos[$i]);
+                push @{ $points{$chr} }, $pos;
+            }
+        }
+    }
+    # add tails to the data
+    foreach my $chr (keys %{ $size{$mod} }) {
+        my $len = $size{$mod}{$chr};
+        push @{ $points{$chr} }, $len;
+    }
+    
     return %points;
 }
 
