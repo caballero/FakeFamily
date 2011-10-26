@@ -461,7 +461,7 @@ sub getRecomPoints {
         }
         my @pos_fil = filterPointsHapMap($chr, @pos);
         @{ $points{$chr} } = @pos_fil;
-        $num += length @{ $points{$chr} };
+        $num += length @pos_fil;
     }
     
     if (defined $points) {
@@ -473,9 +473,13 @@ sub getRecomPoints {
                     push @pos, "$chr:$pos";
                 }
             }
-            @pos = shuffle(@pos);
+            my $pp = join (",", @pos);
+            warn "original points: $pp\n" if (defined $verbose);
+            @pos    = shuffle(@pos);
+            $pp = join (",", @pos);
+            warn "shuffle points: $pp\n" if (defined $verbose);
             %points = ();
-            for (my $i = 1; $i <= $points; $i++) {
+            for (my $i = 0; $i < $points; $i++) {
                 my ($chr, $pos) = split (/:/, $pos[$i]);
                 push @{ $points{$chr} }, $pos;
             }
