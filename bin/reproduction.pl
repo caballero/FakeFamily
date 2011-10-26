@@ -474,11 +474,7 @@ sub getRecomPoints {
                     push @pos, "$chr:$pos";
                 }
             }
-            my $pp = join (",", @pos);
-            warn "original points: $pp\n" if (defined $verbose);
             @pos    = shuffle(@pos);
-            $pp = join (",", @pos);
-            warn "shuffle points: $pp\n" if (defined $verbose);
             %points = ();
             for (my $i = 0; $i < $points; $i++) {
                 my ($chr, $pos) = split (/:/, $pos[$i]);
@@ -491,7 +487,8 @@ sub getRecomPoints {
         next if ($chr =~ m/chrM|chrY|chrX/);
         my $len = $size{$mod}{$chr};
         push @{ $points{$chr} }, $len;
-        my $pts = length @{ $points{$chr} };
+        @{ $points{$chr} } = sort {$a<=>$b} (@{ $points{$chr} });
+        my $pts = scalar @{ $points{$chr} };
         warn "    $pts recombination points in $chr\n" if (defined $verbose);
     }
     
