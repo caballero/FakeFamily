@@ -485,6 +485,8 @@ sub getRecomPoints {
     foreach my $chr (keys %{ $size{$mod} }) {
         my $len = $size{$mod}{$chr};
         push @{ $points{$chr} }, $len;
+        my $pts = length @{ $points{$chr} };
+        warn "    $pts recombination points in $chr\n" if (defined $verbose);
     }
     
     return %points;
