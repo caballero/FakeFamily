@@ -459,9 +459,9 @@ sub getRecomPoints {
             $pos += getSize();
             push @pos, $pos;
         }
-        $num += length @{ $points{$chr} };
         my @pos_fil = filterPointsHapMap($chr, @pos);
         @{ $points{$chr} } = @pos_fil;
+        $num += length @{ $points{$chr} };
     }
     
     if (defined $points) {
