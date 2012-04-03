@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>FakeFamily by caballero</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>FakeFamily</h1>
+<p>Simulation of family genomes</p>
+        <p class="view"><a href="https://github.com/caballero/FakeFamily">View the Project on GitHub <small>caballero/FakeFamily</small></a></p>
+        <ul>
+          <li><a href="https://github.com/caballero/FakeFamily/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/caballero/FakeFamily/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/caballero/FakeFamily">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>#FAMILY GENOME SIMULATOR</p>
+
+<p>Copyright (C) 2011 Juan Caballero [Insitute for Systems Biology]</p>
+
+<h2>Quick tutorial</h2>
+
+<h3>STEP 1. Create parental genomes</h3>
+
+<p><code>bin/personalGenome.pl -g data/hg19.fa.gz -d data/dbSNP132.var.gz -p data/CEU.var.gz -o father.var -s M</code></p>
+
+<p><code>bin/personalGenome.pl -g data/hg19.fa.gz -d data/dbSNP132.var.gz -p data/CEU.var.gz -o mother.var</code></p>
+
+<h3>STEP 2. Artificial sex</h3>
+
+<p><code>bin/reproduction.pl -f father.var -m mother.var -c girl1.var -r data/hg19.fa.gz</code></p>
+
+<p><code>bin/reproduction.pl -f father.var -m mother.var -c boy2.var -s M</code></p>
+
+<p><code>cp boy2.var boy3.var # identical twin</code></p>
+
+<h3>STEP 3. Add noise/error</h3>
+
+<p><code>bin/noise.pl -i father.var -o father.var.data -s M -g data/hg19.fa.gz</code></p>
+
+<p><code>bin/noise.pl -i mother.var -o mother.var.data -s F -g data/hg19.fa.gz</code></p>
+
+<p><code>bin/noise.pl -i  girl1.var -o  girl1.var.data -s F -g data/hg19.fa.gz</code></p>
+
+<p><code>bin/noise.pl -i   boy1.var -o   boy1.var.data -s M -g data/hg19.fa.gz</code></p>
+
+<p><code>bin/noise.pl -i   boy2.var -o   boy2.var.data -s M -g data/hg19.fa.gz</code></p>
+
+<p>Complete documentation:
+<code>perldoc PROGRAM</code>
+<code>PROGRAM -h</code>
+<code>PROGRAM --help</code></p>
+
+<h2>Description</h2>
+
+<p>I split this problem in three steps (programs):</p>
+
+<ol>
+<li><p>Creating a personal genome (personalGenome.pl): I use three sources for the variation: 1000genomes population variations data, dbSNP and the reference genome. The total number of variations (SNPs for now) is an expected number (~3 mill) with a little noise, or you can fix the number. De novo SNPs can be added (default 1%). You can choose the sex, but for now I not modeling recombination in sexual chromosomes. In the first round it selects population-specific SNPs (~ 1mill because data comes from SNP-chips), the second round take data from dbSNP and in the last round de novo SNPs are created. I integrate diverse options and configurations (no population SNPs, no de novo, homozygous SNPs, etc) to as flexible as possible. The output is a text table with columns:
+CHROM POSITION REF_ALLELE ALLELE_1 ALLELE_2 ALLELE_INFO</p></li>
+<li><p>Artificial Sex (reproduction.pl): this script takes a personal genome from a "father" and a "mother", performs meiosis in each genome based in a distribution of recombination points and mix together to produce a "child". You can define the sex, total SNPs, de novo SNPs and other parameters. The output is the same:
+CHROM POSITION REF_ALLELE ALLELE_1 ALLELE_2 ALLELE_INFO</p></li>
+<li><p>Noise/Error addition (noise.pl): this part models missing SNPs, bad base calling, half-calling and false positives SNPs as error/noise.</p></li>
+</ol><p>There are some optimization I can do, each programs uses a lot of memory (~4-5 GB), because I need to load the reference genome, but are relatively fast, 5 min to produce a genome and 5 min to produce a child.</p>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/caballero">caballero</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>
