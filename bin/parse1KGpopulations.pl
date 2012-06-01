@@ -96,7 +96,7 @@ while (<VCF>) {
         }
         foreach $pop (@allpop) {
             next unless (defined $poptot{$pop});
-            next if ($poptot{$pop} < $min_$share);
+            next if ($poptot{$pop} < $min_share);
             my $f1      = 0; # freq for 0|0 - homo ref
             my $f2      = 0; # freq for 0|1 - hetero
             my $f3      = 0; # freq for 1|0 - hetero
