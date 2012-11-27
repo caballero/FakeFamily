@@ -19,6 +19,7 @@ perl pedigree.pl [OPTIONS]
     -e --exclude       List of pedigrees to avoid as founders    [none]
     -r --reference     Reference genome version                  [hg19]
     -d --denovo        De novo mutation rate                     [0.0]
+    -a --all_ind       Use all possible individuals              [no]
     -h --help          Print help and exit
     -v --verbose       Verbose mode
     --version          Print version and exit
@@ -66,14 +67,16 @@ my $pedigree =  undef;
 my $select   =  undef;
 my $exclude  =  undef;
 my $ref      = 'hg19';
-my $denovo   = 0.0;
-my $demo     = undef;
+my $denovo   =    0.0;
+my $demo     =  undef;
+my $all_ind  =  undef;
 
 # Main variables
 my $our_version  = 0.1;        # Script version number
 my $data_table   = '/u5/www/software/gms/current/public/pedigrees/export';
 my $reproduction = '/u1/home/jcaballe/FakeFamily/reproduction-cg.pl';
-my ($select_re, $exclude_re);
+my %exc;
+my %sel;
 my %ind;
 my %fnd;
 my %new;
@@ -91,6 +94,7 @@ GetOptions(
     's|select:s'       => \$select,
     'r|reference:s'    => \$ref,
     'd|denovo:s'       => \$denovo,
+    'all_ind'          => \$all_ind,
     'demo'             => \$demo
 ) or pod2usage(-verbose => 2);
 
@@ -99,13 +103,13 @@ pod2usage(-verbose => 2) if  (defined $help);
 pod2usage(-verbose => 2) if !(defined $pedigree);
 
 if (defined $select) {
-    $select_re =  $select;
-    $select_re =~ s/,/\|/g;
+    my @sel = split (/,/, $select);
+    foreach my $id (@sel) { $sel{$id} = 1; }
 }
 
 if (defined $exclude) {
-    $exclude_re =  $exclude;
-    $exclude_re =~ s/,/\|/g;
+    my @exc = split (/,/, $exclude);
+    foreach my $id (@exc) { $exc{$id} = 1; }
 }
 
 loadIndividuals();
@@ -140,7 +144,8 @@ sub loadIndividuals {
         my $father  = $line[6];
         my $mother  = $line[6];
         my $asm_ref = $line[17];
-        next if  ($ped_id  =~ m/$exclude/);
+
+        
         next if !($asm_ref =~ m/ref/);
         
         if ($ped_id eq $pedigree) {
@@ -156,19 +161,28 @@ sub loadIndividuals {
                 $ind{$ind_id}{'mother'} = $mother;
                 $nind++;
             }
+            next;
         }
-        else {
+        
+        if (defined $exclude) {
+            next if (defined $exc{$ped_id});
+        }
+
+        if (defined $select) {
+            next unless (defined $sel{$ped_id});
+        }
+        
+        unless (defined $all_ind) {
             next unless ($father eq 'NULL' or $mother eq 'NULL');
-            if    ($sex eq 'female') {
-                push @bag_fnd_f, $ind_id;
-            }
-            elsif ($sex eq 'male') {
-                push @bag_fnd_m, $ind_id;
-            }
-            else {
-                #no sex, exclude this
-            }
         }
+        
+        if    ($sex eq 'female') {
+            push @bag_fnd_f, $ind_id;
+        }
+        elsif ($sex eq 'male') {
+            push @bag_fnd_m, $ind_id;
+        }
+        
     }
     close F;
     
