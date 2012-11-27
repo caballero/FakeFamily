@@ -271,15 +271,34 @@ sub linkFounderFiles {
 
 sub produceOffsprings {
     warn "Producing offsprings\n" if (defined $verbose);
-    foreach my $ind (keys %ind) {
-        my $ind_file    = $ind{$ind}{'file'};
+    my ($ind, $ind_file, $sex, $mother, $mother_file, $father, $father_file)  
+    foreach $ind (keys %ind) {
+        $ind_file = $ind{$ind}{'file'};
+        $sex      = $ind{$ind}{'sex'};
+        
         next if (-e $ind_file);
-        my $mother      = $ind{$ind}{'mother'};
-        my $mother_file = $ind{$mother}{'file'};
-        my $father      = $ind{$ind}{'father'};
-        my $father_file = $ind{$father}{'file'};
-        my $sex         = $ind{$ind}{'sex'};
-        warn "Generating $ind ($sex), Mother=$mother, Father=$father\n" if (defined $verbose);
+        
+        $mother = $ind{$ind}{'mother'};
+        if    (defined $fnd{$mother}{'file'}) {
+            $mother_file = $fnd{$mother}{'file'};
+        }
+        elsif (defined $ind{$mother}{'file'}) {
+            $mother_file = $ind{$mother}{'file'};
+        }
+        else {
+            die "mising mother file for $ind -> $mother\n";
+        }
+        
+        $father = $ind{$ind}{'father'};
+        if    (defined $fnd{$father}{'file'}) {
+            $father_file = $fnd{$father}{'file'};
+        }
+        elsif (defined $ind{$father}{'file'}) {
+            $father_file = $ind{$father}{'file'};
+        }
+        else {
+            die "mising father file for $ind -> $mother\n";
+        }
         
         next unless (-e $mother_file and -e $father_file);
         warn "Generating $ind ($sex), Mother=$mother, Father=$father\n" if (defined $verbose);
