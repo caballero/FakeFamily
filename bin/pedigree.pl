@@ -262,9 +262,10 @@ sub getPathFounders {
 sub linkFounderFiles {
     warn "Linking founders genotypes\n" if (defined $verbose);
     foreach my $ind (keys %fnd) {
-        my $file = $fnd{$ind}{'file'};
-        #system ("cp $file $ind");
-        system ("ln -s $file $ind");
+        my $file = $fnd{$ind}{'path'};
+        my $name = $fnd{$ind}{'file'};
+        #system ("cp $file $name");
+        system ("ln -s $file $name");
     }
 }
 
