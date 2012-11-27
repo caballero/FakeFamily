@@ -183,10 +183,10 @@ sub loadIndividuals {
     }
     close F;
     
-    if ($nfnd{'female'} < length @bag_fnd_f) {
+    if ($nfnd{'female'} > scalar @bag_fnd_f) {
         die "Not enough female founders to swap\n";
     }
-    if ($nfnd{  'male'} < length @bag_fnd_m) {
+    if ($nfnd{  'male'} > scalar @bag_fnd_m) {
         die "Not enough male founders to swap\n";
     }
     
