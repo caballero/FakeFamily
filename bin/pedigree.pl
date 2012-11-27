@@ -116,7 +116,7 @@ loadIndividuals();
 swapFounders();
 getPathFounders();
 linkFounderFiles();
-produceOffsprings();
+#produceOffsprings();
 
 ###################################
 ####   S U B R O U T I N E S   ####
