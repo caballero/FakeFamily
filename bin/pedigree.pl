@@ -142,11 +142,10 @@ sub loadIndividuals {
         my $ind_id  = $line[3];
         my $sex     = $line[5];
         my $father  = $line[6];
-        my $mother  = $line[6];
+        my $mother  = $line[7];
         my $asm_ref = $line[17];
-
-        
-        next if !($asm_ref =~ m/$ref/);
+        next unless (defined $asm_ref);        
+        next unless ($asm_ref eq $ref);
         
         if ($ped_id eq $pedigree) {
             if ($father eq 'NULL' or $mother eq 'NULL') {
