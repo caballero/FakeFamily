@@ -270,7 +270,6 @@ sub linkFounderFiles {
 }
 
 sub produceOffsprings {
-    warn "Producing offsprings\n" if (defined $verbose);
     my ($ind, $ind_file, $sex, $mother, $mother_file, $father, $father_file);
     foreach $ind (keys %ind) {
         $ind_file = $ind{$ind}{'file'};
