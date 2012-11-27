@@ -146,7 +146,7 @@ sub loadIndividuals {
         my $asm_ref = $line[17];
 
         
-        next if !($asm_ref =~ m/ref/);
+        next if !($asm_ref =~ m/$ref/);
         
         if ($ped_id eq $pedigree) {
             if ($father eq 'NULL' or $mother eq 'NULL') {
@@ -165,7 +165,7 @@ sub loadIndividuals {
         }
         
         if (defined $exclude) {
-            next if (defined $exc{$ped_id});
+            next     if (defined $exc{$ped_id});
         }
 
         if (defined $select) {
