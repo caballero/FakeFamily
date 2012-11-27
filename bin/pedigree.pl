@@ -272,17 +272,17 @@ sub linkFounderFiles {
 sub produceOffsprings {
     warn "Producing offsprings\n" if (defined $verbose);
     foreach my $ind (keys %ind) {
-        my $ind_file = $ind{$ind}{'file'};
+        my $ind_file    = $ind{$ind}{'file'};
         next if (-e $ind_file);
         my $mother      = $ind{$ind}{'mother'};
         my $mother_file = $ind{$mother}{'file'};
-        my $mother_new  = $fnd{$mother}{'new'};
         my $father      = $ind{$ind}{'father'};
         my $father_file = $ind{$father}{'file'};
-        my $father_new  = $fnd{$father}{'new'};
         my $sex         = $ind{$ind}{'sex'};
+        warn "Generating $ind ($sex), Mother=$mother, Father=$father\n" if (defined $verbose);
+        
         next unless (-e $mother_file and -e $father_file);
-        warn "Generating $ind ($sex), Mother=$mother ($mother_new), Father=$father ($father_new)\n" if (defined $verbose);
+        warn "Generating $ind ($sex), Mother=$mother, Father=$father\n" if (defined $verbose);
         if (defined $demo) {
             system ("touch $ind_file");
         }
