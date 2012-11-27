@@ -150,12 +150,10 @@ sub loadIndividuals {
         
         if ($ped_id eq $pedigree) {
             if ($father eq 'NULL' or $mother eq 'NULL') {
-                $fnd{$ind_id}           = 1;
                 $fnd{$ind_id}{'sex'}    = $sex;
                 $nfnd{$sex}++;
             }
             else {
-                $ind{$ind_id}           = 1;
                 $ind{$ind_id}{'sex'}    = $sex;
                 $ind{$ind_id}{'father'} = $father;
                 $ind{$ind_id}{'mother'} = $mother;
