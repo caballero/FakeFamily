@@ -133,7 +133,7 @@ sub loadIndividuals {
     my %nfnd;
     $nfnd{'female'} = 0;
     $nfnd{  'male'} = 0;
-    open F, "$data_table/$file" or die "cannot open $file\n";
+    open F, "$data_table/$file" or die "cannot open $data_table/$file\n";
     while (<F>) {
         chomp;
         next if (m/^Study/); # skip header
@@ -231,7 +231,7 @@ sub swapFounders {
 sub getPathFounders {
     my $file = 'gms_export_assembly_file_pedigrees.txt';
     warn "Finding path to files\n" if (defined $verbose);
-    open F, "$file" or die "cannot open $file\n";
+    open F, "$data_table/$file" or die "cannot open $data_table/$file\n";
     while (<F>) {
         chomp;
         my $path = undef;
