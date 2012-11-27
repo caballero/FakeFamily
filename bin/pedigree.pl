@@ -67,6 +67,7 @@ my $select   =  undef;
 my $exclude  =  undef;
 my $ref      = 'hg19';
 my $denovo   = 0.0;
+my $demo     = undef;
 
 # Main variables
 my $our_version  = 0.1;        # Script version number
@@ -89,7 +90,8 @@ GetOptions(
     'e|exclude:s'      => \$exclude,
     's|select:s'       => \$select,
     'r|reference:s'    => \$ref,
-    'd|denovo:s'       => \$denovo
+    'd|denovo:s'       => \$denovo,
+    'demo'             => \$demo
 ) or pod2usage(-verbose => 2);
 
 printVersion() if (defined $version);
@@ -269,7 +271,12 @@ sub produceOffsprings {
         my $sex         = $ind{$ind}{'sex'};
         next unless (-e $mother_file and -e $father_file);
         warn "Generating $ind ($sex), Mother=$mother ($mother_new), Father=$father ($father_new)\n" if (defined $verbose);
-        system ("$reproduction -f $father_file -m $mother_file -s $sex -c $ind_file -d $denovo");
+        if (defined $demo) {
+            system ("touch $ind_file");
+        }
+        else {
+            system ("$reproduction -f $father_file -m $mother_file -s $sex -c $ind_file -d $denovo");
+        }
         $nind--;
     }
     
