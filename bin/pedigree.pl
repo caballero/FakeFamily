@@ -264,6 +264,7 @@ sub linkFounderFiles {
     foreach my $ind (keys %fnd) {
         my $file = $fnd{$ind}{'path'};
         my $name = $fnd{$ind}{'file'};
+        warn "$file -> $name\n" if (defined $verbose);
         #system ("cp $file $name");
         system ("ln -s $file $name");
     }
