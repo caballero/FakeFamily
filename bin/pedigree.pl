@@ -116,7 +116,7 @@ loadIndividuals();
 swapFounders();
 getPathFounders();
 linkFounderFiles();
-#produceOffsprings();
+produceOffsprings();
 
 ###################################
 ####   S U B R O U T I N E S   ####
@@ -264,7 +264,6 @@ sub linkFounderFiles {
     foreach my $ind (keys %fnd) {
         my $file = $fnd{$ind}{'path'};
         my $name = $fnd{$ind}{'file'};
-        warn "$file -> $name\n" if (defined $verbose);
         #system ("cp $file $name");
         system ("ln -s $file $name");
     }
