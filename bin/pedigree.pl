@@ -6,8 +6,7 @@ pedigree.pl
 
 =head1 DESCRIPTION
 
-Simulate a complete pedigree structure using a defined or random selections
-of founders.
+Simulate a complete pedigree structure using a random selection of founders.
 
 =head1 USAGE
 
@@ -20,6 +19,7 @@ perl pedigree.pl [OPTIONS]
     -r --reference     Reference genome version                  [hg19]
     -d --denovo        De novo mutation rate                     [0.0]
     -a --all_ind       Use all possible individuals              [no]
+    -o --outdir        Write files in this directory             [localdir]
     -h --help          Print help and exit
     -v --verbose       Verbose mode
     --version          Print version and exit
@@ -70,6 +70,7 @@ my $ref      = 'hg19';
 my $denovo   =    0.0;
 my $demo     =  undef;
 my $all_ind  =  undef;
+my $outdir   =    '.';
 
 # Main variables
 my $our_version  = 0.1;        # Script version number
@@ -94,7 +95,8 @@ GetOptions(
     's|select:s'       => \$select,
     'r|reference:s'    => \$ref,
     'd|denovo:s'       => \$denovo,
-    'all_ind'          => \$all_ind,
+    'a|all_ind'        => \$all_ind,
+    'o|outdir:s'       => \$outdir,
     'demo'             => \$demo
 ) or pod2usage(-verbose => 2);
 
@@ -110,6 +112,11 @@ if (defined $select) {
 if (defined $exclude) {
     my @exc = split (/,/, $exclude);
     foreach my $id (@exc) { $exc{$id} = 1; }
+}
+
+if ($outdir ne '.') {
+    mkdir $outdir unless (-d $outdir);
+    die "Problem with output dir $outdir\n" unless (-d $outdir); 
 }
 
 loadIndividuals();
@@ -224,7 +231,7 @@ sub swapFounders {
         }
         
         $new{$new} = $ind;
-        warn "$ind -> $new\n" if (defined $verbose);
+        warn "$ind <=> $new\n" if (defined $verbose);
     }
 }
 
