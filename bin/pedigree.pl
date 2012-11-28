@@ -282,7 +282,7 @@ sub produceOffsprings {
         $ind_file = $ind{$ind}{'file'};
         $sex      = $ind{$ind}{'sex'};
         
-        next if (-e $ind_file);
+        next if (-e "$outdir/$ind_file");
         
         $mother = $ind{$ind}{'mother'};
         if    (defined $fnd{$mother}{'file'}) {
@@ -306,13 +306,13 @@ sub produceOffsprings {
             die "mising father file for $ind -> $mother\n";
         }
         
-        next unless (-e $mother_file and -e $father_file);
+        next unless (-e "$outdir/$mother_file" and -e "$outdir/$father_file");
         warn "Generating $ind ($sex), Mother=$mother, Father=$father\n" if (defined $verbose);
         if (defined $demo) {
-            system ("touch $ind_file");
+            system ("touch $outdir/$ind_file");
         }
         else {
-            system ("$reproduction -f $father_file -m $mother_file -s $sex -c $ind_file -d $denovo");
+            system ("$reproduction -f $outdir/$father_file -m $outdir/$mother_file -s $sex -c $outdir/$ind_file -d $denovo");
         }
         $nind--;
     }
