@@ -271,8 +271,8 @@ sub linkFounderFiles {
     foreach my $ind (keys %fnd) {
         my $file = $fnd{$ind}{'path'};
         my $name = $fnd{$ind}{'file'};
-        #system ("cp $file $name");
-        system ("ln -s $file $name");
+        #system ("cp $file $outdir/$name");
+        system ("ln -s $file $outdir/$name");
     }
 }
 
