@@ -192,7 +192,7 @@ while (<F>) {
     next if (m/^>/);
     next if (m/^\n/);
     
-    ($loc, $plo, $all, $chr, $ini, $end, $type, $ref, $alt) = split (/\t/, $_);
+    my ($loc, $plo, $all, $chr, $ini, $end, $type, $ref, $alt, @rest) = split (/\t/, $_);
     
     next if ($all eq 'all' and $type =~ m/no-ref|no-call|ref/);
     
@@ -214,10 +214,10 @@ while (<F>) {
     }
     
     next if ($all != $allele);
-    
+    $all = 1;
     $genome{$chr}{$ini}{'father'} = $alt;
     $genome{$chr}{$ini}{'ref'}    = $ref;
-    $genome{$chr}{$ini}{'finfo'}  = $_;
+    $genome{$chr}{$ini}{'finfo'}  = join "\t", ($loc, $plo, $all, $chr, $ini, $end, $type, $ref, $alt, @rest);
 }
 close F;
 
@@ -232,7 +232,7 @@ while (<M>) {
     next if (m/^>/);
     next if (m/^\n/);
      
-    ($loc, $plo, $all, $chr, $ini, $end, $type, $ref, $alt) = split (/\t/, $_);
+    my ($loc, $plo, $all, $chr, $ini, $end, $type, $ref, $alt, @rest) = split (/\t/, $_);
     
     next if ($all eq 'all' and $type =~ m/no-ref|no-call|ref/);
     
