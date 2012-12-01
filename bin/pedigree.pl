@@ -75,7 +75,7 @@ my $outdir   =    '.';
 # Main variables
 my $our_version  = 0.1;        # Script version number
 my $data_table   = '/u5/www/software/gms/current/public/pedigrees/export';
-my $reproduction = '/u1/home/jcaballe/FakeFamily/reproduction-cg.pl';
+my $reproduction = '~jcaballe/FakeFamily/reproduction-cg.pl';
 my %exc;
 my %sel;
 my %ind;
