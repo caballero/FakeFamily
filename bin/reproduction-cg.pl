@@ -155,10 +155,10 @@ pod2usage(-verbose => 2)     if (defined $help);
 pod2usage(-verbose => 2) unless (defined $mother and defined $father);
 
 # Calculate number of SNPs to process
-$numsnp = calcNumSnp() unless (defined $numsnp);
-$newsnp = int($denovo * $numsnp);
-$hersnp = $numsnp - $newsnp;
-warn "$numsnp will be selected\n" if (defined $verbose);
+#$numsnp = calcNumSnp() unless (defined $numsnp);
+#$newsnp = int($denovo * $numsnp);
+#$hersnp = $numsnp - $newsnp;
+#warn "$numsnp will be selected\n" if (defined $verbose);
 
 # Check param
 validateParam();
@@ -214,10 +214,8 @@ while (<F>) {
     }
     
     next if ($all != $allele);
-    $all = 1;
-    $genome{$chr}{$ini}{'father'} = $alt;
-    $genome{$chr}{$ini}{'ref'}    = $ref;
-    $genome{$chr}{$ini}{'finfo'}  = join "\t", ($loc, $plo, $all, $chr, $ini, $end, $type, $ref, $alt, @rest);
+    $genome{$chr}{$ini}{'father'}  = join "\t", ($loc, $plo, 1, $chr, $ini, $end, $type, $ref, $alt, @rest);
+    $genome{$chr}{$ini}{'fref'  }  = join "\t", ($loc, $plo, 2, $chr, $ini, $end, $type, $ref, $ref, @rest);
 }
 close F;
 
@@ -245,10 +243,9 @@ while (<M>) {
     }    
     
     next if ($all != $allele);
-    
-    $genome{$chr}{$pos}{'mother'} = $alt;
-    $genome{$chr}{$pos}{'ref'}    = $ref;
-    $genome{$chr}{$pos}{'minfo'}  = $_;
+    $genome{$chr}{$ini}{'mother'}  = join "\t", ($loc, $plo, 2, $chr, $ini, $end, $type, $ref, $alt, @rest);
+    $genome{$chr}{$ini}{'mref'  }  = join "\t", ($loc, $plo, 1, $chr, $ini, $end, $type, $ref, $ref, @rest);
+
 }
 close M;
 
@@ -291,7 +288,7 @@ foreach $chr (keys %genome) {
                 $al1 = $genome{$chr}{$pos}{'father'};
             }
             else {
-                $al1 = $genome{$chr}{$pos}{'ref'};
+                $al1 = $genome{$chr}{$pos}{'mref'};
             }
         
             # Mother genotype
@@ -299,59 +296,30 @@ foreach $chr (keys %genome) {
                 $al2 = $genome{$chr}{$pos}{'mother'};
             }
             else {
-                $al2 = $genome{$chr}{$pos}{'ref'};
+                $al2 = $genome{$chr}{$pos}{'fref'};
             }
         }
-        
-        # Reference genotype
-        $ref  = $genome{$chr}{$pos}{'ref'};
-        
-        # Skip reference calls
-        next if ($ref eq $al1 and $ref eq $al2);
-        
-        # Capture RS information
-        $info = '';
-        if (defined $genome{$chr}{$pos}{'finf'}) {
-            if (defined $genome{$chr}{$pos}{'minf'}) {
-                $info = $genome{$chr}{$pos}{'finf'} . ',' . $genome{$chr}{$pos}{'minf'};
-            }
-            else {
-                $info = $genome{$chr}{$pos}{'finf'} . ',';
-            }
-        }
-        else {
-            if (defined $genome{$chr}{$pos}{'minf'}) {
-                $info = ',' .  $genome{$chr}{$pos}{'minf'};
-            }
-        }  
         
         # Record data
-        push @var, "$chr:$pos:$ref:$al1:$al2:$info";
+        if ($al1 eq '-') {
+            $var{$chr}{$pos} = "$al2\n";
+        }
+        elsif ($al2 eq '-') {
+            $var{$chr}{$pos} = "$al1\n";
+        }
+        else {
+            $var{$chr}{$pos} = "$al1\n$al2\n";
+        }
+
         $nsnp++;
     }
 }
 undef(%genome); # Free memory
 undef(%recom);
 
-# Reduce SNPs if required
-while ($nsnp > $hersnp) {
-    $var = int(rand @var);
-    next unless ($var[$var] =~ m/:/);
-#    ($chr,$pos,$ref,$al1,$al2,$info) = split (/:/, $var[$var]);  
-#    next if ($al1 eq $al2);   # Prefer to remove heterozygous positions
-    $var[$var] = ''; # deletion
-    $nsnp--;
-}
 warn "   $nsnp total parental SNPs\n" if (defined $verbose);
 
-foreach $var (@var) {
-    next unless ($var =~ m/:/);
-    ($chr, $pos, $ref, $al1, $al2, $info) = split (/:/, $var);
-    $var{$chr}{$pos} = "$ref\t$al1\t$al2\t$info";
-}
-undef(@var);
-warn "   $nsnp parental SNPs selected\n" if (defined $verbose);
-
+$numsnp = $nsnp; # No De novo, maybe in a future
 # Add de novo mutations
 if ($nsnp < $numsnp) {
     warn "selecting new SNPs\n" if (defined $verbose);
@@ -599,7 +567,7 @@ sub dnaSel {
 sub validateParam {
     die "father file not found: $father\nKilled\n"    unless (-e $father);
     die "mother file not found: $mother\nKilled\n"    unless (-e $mother);
-    die "numsnp isn't numeric:   $numsnp\nKilled\n"   unless ($numsnp =~ m/\d+/ and $numsnp > 1);
+    #die "numsnp isn't numeric:   $numsnp\nKilled\n"   unless ($numsnp =~ m/\d+/ and $numsnp > 1);
     die "denovo must be 0.0-1.0: $denovo\nKilled\n"   unless ($denovo =~ m/\d+/ and $denovo >= 0 and $denovo <= 1);
     die "hratio must be 0.0-1.0: $hratio\nKilled\n"   unless ($hratio =~ m/\d+/ and $hratio >= 0 and $hratio <= 1);
     die "sex must be F or M:     $sex\nKilled\n"      unless ($sex eq 'F' or $sex eq 'M');
