@@ -109,7 +109,7 @@ my @allele     = (1, 2);
 my %chrom      = ();
 my @chrom      = ();
 my ($father_h, $mother_h, $genome_h);
-my ($all, $al2, $chr, $ini, $end, $pos);
+my ($al1, $al2, $chr, $ini, $end, $pos, $allele, $id, $len, $ref);
 my $nsnp       = 0;
 my $newsnp     = 0;
 my $hersnp     = 0;
