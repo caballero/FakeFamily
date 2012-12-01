@@ -109,7 +109,7 @@ my @allele     = (1, 2);
 my %chrom      = ();
 my @chrom      = ();
 my ($father_h, $mother_h, $genome_h);
-my ($loc, $plo, $all, $chr, $ini, $end, $type, $ref, $alt, $allele, $id, $len, $var);
+my ($all, $al2, $chr, $ini, $end, $pos);
 my $nsnp       = 0;
 my $newsnp     = 0;
 my $hersnp     = 0;
@@ -154,11 +154,6 @@ GetOptions(
 pod2usage(-verbose => 2)     if (defined $help);
 pod2usage(-verbose => 2) unless (defined $mother and defined $father);
 
-# Calculate number of SNPs to process
-#$numsnp = calcNumSnp() unless (defined $numsnp);
-#$newsnp = int($denovo * $numsnp);
-#$hersnp = $numsnp - $newsnp;
-#warn "$numsnp will be selected\n" if (defined $verbose);
 
 # Check param
 validateParam();
