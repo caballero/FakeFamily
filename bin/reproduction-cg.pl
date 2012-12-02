@@ -396,8 +396,7 @@ if ($nsnp < $numsnp) {
 warn "printing SNPs\n" if (defined $verbose);
 foreach $chr (sort (keys %var)) {
     foreach $pos (sort {$a<=>$b} (keys %{ $var{$chr} })) {
-        print join "\t", $chr, $pos, $var{$chr}{$pos};
-        print "\n";
+        print $var{$chr}{$pos};
     }
 }
 warn "done\n" if (defined $verbose);
