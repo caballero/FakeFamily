@@ -507,7 +507,7 @@ sub filterPoints {
     my $left   = $centro;
     my $right  = $size - $centro;
     my @pos = ();
-	warn "    original recombination points $#_\n" if (defined $verbose);
+	#warn "    original recombination points $#_\n" if (defined $verbose);
     foreach my $pos (@_) {
         my $dice = rand();
         my $prob = 0;
@@ -520,7 +520,7 @@ sub filterPoints {
         
         push @pos, $pos if ($dice < $prob);
     }
-	warn "    filtered recombination points $#pos\n" if (defined $verbose);
+	#warn "    filtered recombination points $#pos\n" if (defined $verbose);
     return @pos;
 }
 
@@ -529,7 +529,7 @@ sub filterPointsHapMap {
 	my $hm   = new HapMap($mod);
     my @pos  = ();
     my $lim  = 10; # minimal genetic distance to consider a recombination
-	warn "    $chr original recombination points $#_\n" if (defined $verbose);
+	#warn "    $chr original recombination points $#_\n" if (defined $verbose);
 	my $last = 1;
     foreach my $pos (@_) {
         my $gendis = $hm->genetic_distance($chr, $last, $pos);
@@ -538,7 +538,7 @@ sub filterPointsHapMap {
 			$last    = $pos;
 		}
     }
-	warn "    $chr filtered recombination points $#pos\n" if (defined $verbose);
+	#warn "    $chr filtered recombination points $#pos\n" if (defined $verbose);
     return @pos;
 }
 
