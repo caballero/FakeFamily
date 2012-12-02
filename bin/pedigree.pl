@@ -260,6 +260,8 @@ sub getPathFounders {
             $path = $line[15];
             @path = split (/\//, $path);
             $name = pop @path;
+            $name =~ s/.bz2$//;
+            $name =~ s/.gz$//;
             $ind{$ind}{'file'} = $name;
         }
     }
