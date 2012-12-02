@@ -528,7 +528,7 @@ sub filterPointsHapMap {
     my $chr  = shift @_;
 	my $hm   = new HapMap($mod);
     my @pos  = ();
-    my $lim  = 9; # minimal genetic distance to consider a recombination
+    my $lim  = 10; # minimal genetic distance to consider a recombination
 	warn "    $chr original recombination points $#_\n" if (defined $verbose);
 	my $last = 1;
     foreach my $pos (@_) {
