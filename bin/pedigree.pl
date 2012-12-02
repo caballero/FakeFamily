@@ -315,7 +315,9 @@ sub produceOffsprings {
             system ("touch $outdir/$ind_file");
         }
         else {
-            system ("$reproduction -v -f $outdir/$father_file -m $outdir/$mother_file -s $sex -c $outdir/$ind_file -d $denovo");
+            my $cmd = "$reproduction -f $outdir/$father_file -m $outdir/$mother_file -s $sex -c $outdir/$ind_file -d $denovo";
+            $cmd .= ' -v' if (defined $verbose);
+            system ($cmd);
         }
         $nind--;
     }
