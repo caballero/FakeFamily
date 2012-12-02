@@ -245,7 +245,7 @@ close M;
 # Child genome
 warn "generating child genome\n" if (defined $verbose);
 open STDOUT, ">$child" or die "cannot open $child\n";
-my $nvar = 0;
+my $nvar = 1;
 foreach $chr (keys %genome) {
     foreach $pos (keys %{ $genome{$chr} }) {
         my $plot = 2;
@@ -297,7 +297,6 @@ foreach $chr (keys %genome) {
             }
         }
 
-        $nvar++;
         
         # Record data
         if ($al1 eq '-') {
@@ -307,9 +306,11 @@ foreach $chr (keys %genome) {
             $var{$chr}{$pos} = "$nvar\t$plot\t$al1\n";
         }
         else {
+            next if ($al1 =~ m/ref/ and $al2 =~ m/ref/ and $al1 eq $al2);
             $var{$chr}{$pos} = "$nvar\t$plot\t$al1\n$nvar\t$plot\t$al2\n";
         }
 
+        $nvar++;
         $nsnp++;
     }
 }
