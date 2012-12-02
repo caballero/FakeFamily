@@ -179,22 +179,23 @@ $max = convertSymbol($max);
 # Meiosis in the Father
 warn "doing meiosis in father genome\n" if (defined $verbose);
 %recom    = getRecomPoints();
-$allele   = $allele[int rand(@allele)]; # initial allele selection, random
+$allele   = 1; # initial allele selection
 $father_h = getFH($father);
 open F, "$father_h" or die "cannot open $father\n";
 while (<F>) {
+    chomp;
     next if (m/^#/);
     next if (m/^>/);
     next if (m/^\n/);
     
     my ($loc, $plo, $all, $chr, $ini, $end, $type, $ref, $alt, @rest) = split (/\t/, $_);
     
-    next if ($all eq 'all' and $type =~ m/no-ref|no-call|ref/);
+    next if ($all eq 'all');
     
     # Sex specific alleles
     next if ($chr eq 'chrX' and $sex eq 'M');
     next if ($chr eq 'chrY' and $sex eq 'F');
-    next if ($chr eq 'chrM');
+    next if ($chr eq 'chrM'); # Mom's mitochondria only
     
     # No recombination in Sex Chromosomes, for now ...
     if ($chr eq 'chrY' or $chr eq 'chrX') {
@@ -209,27 +210,28 @@ while (<F>) {
     }
     
     next if ($all != $allele);
-    $genome{$chr}{$ini}{'father'}  = join "\t", ($loc, $plo, 1, $chr, $ini, $end, $type, $ref, $alt, @rest);
-    $genome{$chr}{$ini}{'fref'  }  = join "\t", ($loc, $plo, 2, $chr, $ini, $end, $type, $ref, $ref, @rest);
+    $genome{$chr}{$ini}{'father'}  = join "\t", (1, $chr, $ini, $end, $type, $ref, $alt, @rest);
+    $genome{$chr}{$ini}{'fref'  }  = join "\t", (2, $chr, $ini, $end, $type, $ref, $ref, @rest);
 }
 close F;
 
 # Meiosis in the Mother
 warn "doing meiosis in mother genome\n" if (defined $verbose);
 %recom    = getRecomPoints();
-$allele   = $allele[int rand(@allele)]; # initial allele selection, random
+$allele   = 1; # initial allele selection
 $mother_h = getFH($mother);
 open M, "$mother_h" or die "cannot open $mother\n";
 while (<M>) {
+    chomp;
     next if (m/^#/);
     next if (m/^>/);
     next if (m/^\n/);
      
     my ($loc, $plo, $all, $chr, $ini, $end, $type, $ref, $alt, @rest) = split (/\t/, $_);
     
-    next if ($all eq 'all' and $type =~ m/no-ref|no-call|ref/);
+    next if ($all eq 'all');
     
-    unless ($chr =~ m/chrM|chrY|chrX/) {
+    unless ($chr =~ m/chrM/) {
         if ($ini > $recom{$chr}->[0]) {
             shift @{ $recom{$chr} };
             # Swap alleles
@@ -238,8 +240,8 @@ while (<M>) {
     }    
     
     next if ($all != $allele);
-    $genome{$chr}{$ini}{'mother'}  = join "\t", ($loc, $plo, 2, $chr, $ini, $end, $type, $ref, $alt, @rest);
-    $genome{$chr}{$ini}{'mref'  }  = join "\t", ($loc, $plo, 1, $chr, $ini, $end, $type, $ref, $ref, @rest);
+    $genome{$chr}{$ini}{'mother'}  = join "\t", (2, $chr, $ini, $end, $type, $ref, $alt, @rest);
+    $genome{$chr}{$ini}{'mref'  }  = join "\t", (1, $chr, $ini, $end, $type, $ref, $ref, @rest);
 
 }
 close M;
@@ -247,13 +249,15 @@ close M;
 # Child genome
 warn "generating child genome\n" if (defined $verbose);
 open STDOUT, ">$child" or die "cannot open $child\n";
-
+my $nvar = 0;
 foreach $chr (keys %genome) {
     foreach $pos (keys %{ $genome{$chr} }) {
+        my $plot = 2;
         if ($chr eq 'chrY' and $sex eq 'M') {
             if (defined $genome{$chr}{$pos}{'father'}) {
-                $al1 = $genome{$chr}{$pos}{'father'};
-                $al2 = '-';
+                $al1  = $genome{$chr}{$pos}{'father'};
+                $al2  = '-';
+                $plot = 1;
             }
             else {
                 next;
@@ -261,8 +265,9 @@ foreach $chr (keys %genome) {
         }
         elsif ($chr eq 'chrX' and $sex eq 'M') {
             if (defined $genome{$chr}{$pos}{'mother'}) {
-                $al2 = $genome{$chr}{$pos}{'mother'};
-                $al1 = '-';
+                $al2  = $genome{$chr}{$pos}{'mother'};
+                $al1  = '-';
+                $plot = 1;
             }
             else {
                 next;
@@ -270,8 +275,9 @@ foreach $chr (keys %genome) {
         }
         elsif ($chr eq 'chrM') {
             if (defined $genome{$chr}{$pos}{'mother'}) {
-                $al2 = $genome{$chr}{$pos}{'mother'};
-                $al1 = '-';
+                $al1  = $genome{$chr}{$pos}{'mother'};
+                $al2  = '-';
+                $plot = 1;
             }
             else {
                 next;
@@ -294,16 +300,18 @@ foreach $chr (keys %genome) {
                 $al2 = $genome{$chr}{$pos}{'fref'};
             }
         }
+
+        $nvar++;
         
         # Record data
         if ($al1 eq '-') {
-            $var{$chr}{$pos} = "$al2\n";
+            $var{$chr}{$pos} = "$nvar\t$plot\t$al2\n";
         }
         elsif ($al2 eq '-') {
-            $var{$chr}{$pos} = "$al1\n";
+            $var{$chr}{$pos} = "$nvar\t$plot\t$al1\n";
         }
         else {
-            $var{$chr}{$pos} = "$al1\n$al2\n";
+            $var{$chr}{$pos} = "$nvar\t$plot\t$al1\n$nvar\t$plot\t$al2\n";
         }
 
         $nsnp++;
