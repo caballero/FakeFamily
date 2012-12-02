@@ -183,10 +183,8 @@ $allele   = 1; # initial allele selection
 $father_h = getFH($father);
 open F, "$father_h" or die "cannot open $father\n";
 while (<F>) {
+    next if (m/^\D/);
     chomp;
-    next if (m/^#/);
-    next if (m/^>/);
-    next if (m/^\n/);
     
     my ($loc, $plo, $all, $chr, $ini, $end, $type, $ref, $alt, @rest) = split (/\t/, $_);
     
@@ -222,11 +220,9 @@ $allele   = 1; # initial allele selection
 $mother_h = getFH($mother);
 open M, "$mother_h" or die "cannot open $mother\n";
 while (<M>) {
+    next if (m/^\D/);
     chomp;
-    next if (m/^#/);
-    next if (m/^>/);
-    next if (m/^\n/);
-     
+ 
     my ($loc, $plo, $all, $chr, $ini, $end, $type, $ref, $alt, @rest) = split (/\t/, $_);
     
     next if ($all eq 'all');
