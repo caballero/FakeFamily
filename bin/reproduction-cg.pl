@@ -208,6 +208,7 @@ while (<F>) {
     }
     
     next if ($all != $allele);
+    $genome{$chr}{$ini}{'fall'}    = $alt;
     $genome{$chr}{$ini}{'father'}  = join "\t", (1, $chr, $ini, $end, $type, $ref, $alt, @rest);
     $genome{$chr}{$ini}{'fref'  }  = join "\t", (2, $chr, $ini, $end, $type, $ref, $ref, @rest);
 }
@@ -236,6 +237,7 @@ while (<M>) {
     }    
     
     next if ($all != $allele);
+    $genome{$chr}{$ini}{'mall'}    = $alt;
     $genome{$chr}{$ini}{'mother'}  = join "\t", (2, $chr, $ini, $end, $type, $ref, $alt, @rest);
     $genome{$chr}{$ini}{'mref'  }  = join "\t", (1, $chr, $ini, $end, $type, $ref, $ref, @rest);
 
@@ -306,7 +308,7 @@ foreach $chr (keys %genome) {
             $var{$chr}{$pos} = "$nvar\t$plot\t$al1\n";
         }
         else {
-            next if ($al1 =~ m/ref/ and $al2 =~ m/ref/ and $al1 eq $al2);
+            next if ($al1 =~ m/ref/ and $al2 =~ m/ref/ and $genome{$chr}{$pos}{'fall'} eq $genome{$chr}{$pos}{'mall'});
             $var{$chr}{$pos} = "$nvar\t$plot\t$al1\n$nvar\t$plot\t$al2\n";
         }
 
