@@ -280,7 +280,8 @@ sub produceOffsprings {
     my ($ind, $ind_file, $sex, $mother, $mother_file, $father, $father_file);
     foreach $ind (keys %ind) {
         $ind_file = $ind{$ind}{'file'};
-        $sex      = $ind{$ind}{'sex'};
+        $sex      = 'M' if ($ind{$ind}{'sex'} eq 'male');
+        $sex      = 'F' if ($ind{$ind}{'sex'} eq 'female');
         
         next if (-e "$outdir/$ind_file");
         
